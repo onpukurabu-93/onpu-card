@@ -474,16 +474,17 @@ body {
       音符を見て、読んでみよう
     </div>
 
-    <button class="select-button" onclick="selectClef('all')">
-      全カード
-    </button>
-
+    <!-- 順番変更：ト音 → ヘ音 → 全カード -->
     <button class="select-button" onclick="selectClef('treble')">
       ト音記号
     </button>
 
     <button class="select-button" onclick="selectClef('bass')">
       ヘ音記号
+    </button>
+
+    <button class="select-button" onclick="selectClef('all')">
+      全カード
     </button>
 
   </section>
@@ -743,18 +744,30 @@ const levelDescriptions = {
 
 const allCards = {
 
+  /* 新Lv.1：ど・ド・1点ド・2点ド・3点ド */
   1: [
+    { name:"ど", key:"ド", img:"h_cdo.png", sound:"h_cdo.m4a" },
+    { name:"ド", key:"ド", img:"h_c00.png", sound:"h_c00.m4a" },
+    { name:"1点ド", key:"ド", img:"t_c1.png", sound:"t_c1.m4a" },
+    { name:"2点ド", key:"ド", img:"t_c2.png", sound:"t_c2.m4a" },
+    { name:"3点ド", key:"ド", img:"t_c3.png", sound:"t_c3.m4a" }
+  ],
+
+  /* 新Lv.2：旧Lv.1 */
+  2: [
     ...trebleCards[1],
     ...trebleCards[2],
     ...trebleCards[3]
   ],
 
-  2: [
+  /* 新Lv.3：旧Lv.2 */
+  3: [
     ...trebleCards[4],
     ...bassCards[4]
   ],
 
-  3: [
+  /* 新Lv.4：旧Lv.3 */
+  4: [
     { name:"大文字ラ", key:"ラ", img:"h_aRa1.png", sound:"h_aRa1.m4a" },
     { name:"大文字シ", key:"シ", img:"h_bSi1.png", sound:"h_bSi1.m4a" },
     { name:"ど", key:"ド", img:"h_cdo.png", sound:"h_cdo.m4a" },
@@ -774,7 +787,8 @@ const allCards = {
     { name:"1点ド", key:"ド", img:"h_c1.png", sound:"h_c1.m4a" }
   ],
 
-  4: [
+  /* 新Lv.5：旧Lv.4 */
+  5: [
     ...trebleCards[1],
     ...trebleCards[2],
     ...trebleCards[3],
@@ -784,6 +798,25 @@ const allCards = {
     ...bassCards[3],
     ...bassCards[4]
   ]
+
+};
+
+
+/* =========================================================
+   レベル説明
+========================================================= */
+
+const allLevelDescriptions = {
+
+  1: "ど・ド・1点ド・2点ド・3点ド",
+
+  2: "ト音記号：1点ド・1点レ・1点ミ・1点ファ・1点ソ・1点ラ・1点シ・2点ド・2点レ・2点ミ・2点ファ・2点ソ・2点ラ・2点シ・3点ド・3点レ・3点ミ",
+
+  3: "ト音記号：ミ・ファ・ソ・ラ・シ・1点ド・1点レ・1点ミ・1点ファ ／ ヘ音記号：1点ファ・1点ミ・1点レ・1点ド・シ・ラ・ソ・ファ・ミ",
+
+  4: "ヘ音記号：大文字ラ・大文字シ・ど・れ・み・ふぁ・そ・ら・し・ド・レ・ミ・ファ・ソ・ラ・シ・1点ド",
+
+  5: "ト音記号・ヘ音記号 全て"
 
 };
 
@@ -866,6 +899,44 @@ function createLevelButtons() {
 
   list.innerHTML = "";
 
+  if (selectedClef === "all") {
+
+    for (let level = 1; level <= 5; level++) {
+
+      const button =
+        document.createElement("button");
+
+      button.className = "level-button";
+
+      const number =
+        document.createElement("span");
+
+      number.className = "level-number";
+      number.textContent = `レベル ${level}`;
+
+      const description =
+        document.createElement("span");
+
+      description.className =
+        "level-description";
+
+      description.textContent =
+        allLevelDescriptions[level];
+
+      button.appendChild(number);
+      button.appendChild(description);
+
+      button.onclick = () => {
+        startLevel(level);
+      };
+
+      list.appendChild(button);
+    }
+
+    return;
+  }
+
+
   for (let level = 1; level <= 4; level++) {
 
     const button =
@@ -894,23 +965,6 @@ function createLevelButtons() {
 
       description.textContent =
         levelDescriptions.bass[level];
-
-    } else {
-
-      const allDescriptions = {
-
-        1: "ト音記号：1点ド・1点レ・1点ミ・1点ファ・1点ソ・1点ラ・1点シ・2点ド・2点レ・2点ミ・2点ファ・2点ソ・2点ラ・2点シ・3点ド・3点レ・3点ミ",
-
-        2: "ト音記号：ミ・ファ・ソ・ラ・シ・1点ド・1点レ・1点ミ・1点ファ ／ ヘ音記号：ミ・ファ・ソ・ラ・シ・1点ド・1点レ・1点ミ・1点ファ",
-
-        3: "ヘ音記号：大文字ラ・大文字シ・ど・れ・み・ふぁ・そ・ら・し・ド・レ・ミ・ファ・ソ・ラ・シ・1点ド",
-
-        4: "ト音記号・ヘ音記号 全て"
-
-      };
-
-      description.textContent =
-        allDescriptions[level];
 
     }
 
@@ -1234,7 +1288,7 @@ function playTrainingCorrectSound(cardSound) {
     sharedAudio.pause();
 
     sharedAudio.src =
-      "クイズ正解1 3.mp3";
+      "seikai.mp3";
 
     sharedAudio.currentTime = 0;
 
