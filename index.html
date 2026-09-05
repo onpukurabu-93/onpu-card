@@ -1,1 +1,1387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>おんぷカード</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Hiragino Sans",
+    "Yu Gothic",
+    "Meiryo",
+    sans-serif;
+  background: #fdf8ed;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 420px;
+  height: 100vh;
+  max-height: 850px;
+  background: #fdf8ed;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  position: relative;
+}
+
+/* -------------------------
+   共通画面
+------------------------- */
+
+.screen {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* -------------------------
+   ヘッダー
+------------------------- */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.back-btn {
+  border: none;
+  background: transparent;
+  color: #5b4636;
+  font-size: 18px;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+  color: #5b4636;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.header-spacer {
+  width: 60px;
+}
+
+/* -------------------------
+   トップ
+------------------------- */
+
+.main-title {
+  text-align: center;
+  color: #5b4636;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 45px 0 35px;
+}
+
+.main-subtitle {
+  text-align: center;
+  color: #806c5a;
+  font-size: 15px;
+  margin-bottom: 30px;
+}
+
+.select-button {
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  padding: 18px 12px;
+  margin-bottom: 14px;
+  background: white;
+  color: #5b4636;
+  font-size: 19px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+
+.select-button:active {
+  transform: scale(0.98);
+}
+
+/* -------------------------
+   レベル画面
+------------------------- */
+
+.level-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.level-button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 18px;
+  background: white;
+  padding: 18px 18px;
+  color: #5b4636;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+
+.level-number {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.level-description {
+  display: block;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #806c5a;
+  white-space: normal;
+}
+
+/* -------------------------
+   カード画面
+------------------------- */
+
+.card-screen {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 10px;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.card-back {
+  border: none;
+  background: transparent;
+  color: #5b4636;
+  font-size: 17px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.card-title {
+  flex: 1;
+  text-align: center;
+  color: #5b4636;
+  font-size: 22px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.level-badge {
+  background: #eadcc8;
+  color: #5b4636;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* -------------------------
+   トレーニングボタン
+------------------------- */
+
+.training-btn {
+  border: none;
+  background: #eadcc8;
+  color: #5b4636;
+  border-radius: 20px;
+  padding: 7px 11px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.training-btn:active {
+  transform: scale(0.96);
+}
+
+/* -------------------------
+   音符カード
+------------------------- */
+
+.card-area {
+  flex: 1;
+  min-height: 0;
+  background: white;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.note-card-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* トレーニング時に音名・鍵盤図を隠す */
+.training-cover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  /* 五線・音符を下の方まで見せる */
+  top: 64%;
+
+  background: white;
+  z-index: 6;
+}
+
+/* 正解時の赤丸 */
+.correct-circle {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border: 8px solid #f04444;
+  border-radius: 50%;
+  left: 50%;
+  top: 34%;
+  transform: translate(-50%, -50%) scale(0.2);
+  opacity: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.correct-circle.show {
+  animation: correctCircle 0.8s ease-out forwards;
+}
+
+@keyframes correctCircle {
+
+  0% {
+    transform:
+      translate(-50%, -50%)
+      scale(0.2);
+    opacity: 0;
+  }
+
+  45% {
+    transform:
+      translate(-50%, -50%)
+      scale(1.12);
+    opacity: 1;
+  }
+
+  70% {
+    transform:
+      translate(-50%, -50%)
+      scale(0.96);
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+    opacity: 1;
+  }
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(253,248,237,0.95);
+  color: #5b4636;
+  font-size: 28px;
+  line-height: 42px;
+  padding: 0;
+  z-index: 5;
+  cursor: pointer;
+  box-shadow: 0 2px 7px rgba(0,0,0,0.08);
+}
+
+.arrow-left {
+  left: 8px;
+}
+
+.arrow-right {
+  right: 8px;
+}
+
+/* -------------------------
+   鍵盤
+------------------------- */
+
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.key-btn {
+  position: relative;
+  border: none;
+  border-radius: 12px;
+  min-height: 54px;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.key-btn:active {
+  transform: scale(0.96);
+}
+
+.key-do {
+  background: #e99595;
+}
+
+.key-re {
+  background: #e6b26a;
+}
+
+.key-mi {
+  background: #d6c45d;
+}
+
+.key-fa {
+  background: #8dbb8d;
+}
+
+.key-so {
+  background: #78a9c8;
+}
+
+.key-la {
+  background: #9292c7;
+}
+
+.key-si {
+  background: #b28bb9;
+}
+
+/* 猫 */
+.cat {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -48px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* -------------------------
+   トレーニング中
+------------------------- */
+
+.card-screen.training-mode .arrow {
+  display: none;
+}
+
+.card-screen.training-mode .training-btn {
+  background: #d8c4a8;
+}
+
+/* -------------------------
+   スマホ
+------------------------- */
+
+@media (max-height: 700px) {
+
+  .main-title {
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+
+  .select-button {
+    padding: 14px;
+  }
+
+  .key-btn {
+    min-height: 48px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<audio id="sharedAudio" preload="auto"></audio>
+
+<div class="app-container">
+
+  <!-- 選択画面 -->
+  <section id="selectScreen" class="screen">
+
+    <div class="main-title">
+      おんぷカード
+    </div>
+
+    <div class="main-subtitle">
+      音符を見て、読んでみよう
+    </div>
+
+    <button class="select-button" onclick="selectClef('all')">
+      全カード
+    </button>
+
+    <button class="select-button" onclick="selectClef('treble')">
+      ト音記号
+    </button>
+
+    <button class="select-button" onclick="selectClef('bass')">
+      ヘ音記号
+    </button>
+
+  </section>
+
+
+  <!-- レベル選択画面 -->
+  <section id="levelScreen" class="screen hidden">
+
+    <div class="header">
+
+      <button class="back-btn" onclick="showSelectScreen()">
+        ＜ 戻る
+      </button>
+
+      <div class="header-title" id="levelTitle">
+        レベル
+      </div>
+
+      <div class="header-spacer"></div>
+
+    </div>
+
+    <div id="levelList" class="level-list"></div>
+
+  </section>
+
+
+  <!-- カード画面 -->
+  <section id="cardScreen" class="card-screen hidden">
+
+    <div class="card-header">
+
+      <button class="card-back" onclick="showLevelScreen()">
+        ＜ 戻る
+      </button>
+
+      <div class="level-badge" id="levelBadge">
+        Lv.1
+      </div>
+
+      <div class="card-title">
+        おんぷカード
+      </div>
+
+      <button
+        id="trainingButton"
+        class="training-btn"
+        onclick="startTraining()"
+      >
+        トレーニング
+      </button>
+
+    </div>
+
+
+    <div
+      id="cardArea"
+      class="card-area"
+      ontouchstart="touchStart(event)"
+      ontouchend="touchEnd(event)"
+    >
+
+      <button
+        class="arrow arrow-left"
+        onclick="previousCard()"
+        aria-label="前のカード"
+      >
+        ‹
+      </button>
+
+      <img
+        id="noteCardImg"
+        class="note-card-img"
+        src=""
+        alt="音符カード"
+      >
+
+      <div
+        id="trainingCover"
+        class="training-cover hidden"
+      ></div>
+
+      <div
+        id="correctCircle"
+        class="correct-circle"
+      ></div>
+
+      <button
+        class="arrow arrow-right"
+        onclick="nextCard()"
+        aria-label="次のカード"
+      >
+        ›
+      </button>
+
+    </div>
+
+
+    <div class="keyboard">
+
+      <button class="key-btn key-do" onclick="pressKey('ド', this)">
+        ド
+      </button>
+
+      <button class="key-btn key-re" onclick="pressKey('レ', this)">
+        レ
+      </button>
+
+      <button class="key-btn key-mi" onclick="pressKey('ミ', this)">
+        ミ
+      </button>
+
+      <button class="key-btn key-fa" onclick="pressKey('ファ', this)">
+        ファ
+      </button>
+
+      <button class="key-btn key-so" onclick="pressKey('ソ', this)">
+        ソ
+      </button>
+
+      <button class="key-btn key-la" onclick="pressKey('ラ', this)">
+        ラ
+      </button>
+
+      <button class="key-btn key-si" onclick="pressKey('シ', this)">
+        シ
+      </button>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<script>
+/* =========================================================
+   カードデータ
+========================================================= */
+
+const trebleCards = {
+
+  1: [
+    { name:"1点ド", key:"ド", img:"t_c1.png", sound:"t_c1.m4a" },
+    { name:"1点レ", key:"レ", img:"t_d1.png", sound:"t_d1.m4a" },
+    { name:"1点ミ", key:"ミ", img:"t_e1.png", sound:"t_e1.m4a" },
+    { name:"1点ファ", key:"ファ", img:"t_f1.png", sound:"t_f1.m4a" },
+    { name:"1点ソ", key:"ソ", img:"t_g1.png", sound:"t_g1.m4a" },
+    { name:"1点ラ", key:"ラ", img:"t_a1.png", sound:"t_a1.m4a" },
+    { name:"1点シ", key:"シ", img:"t_b1.png", sound:"t_b1.m4a" },
+    { name:"2点ド", key:"ド", img:"t_c2.png", sound:"t_c2.m4a" }
+  ],
+
+  2: [
+    { name:"2点ド", key:"ド", img:"t_c2.png", sound:"t_c2.m4a" },
+    { name:"2点レ", key:"レ", img:"t_d2.png", sound:"t_d2.m4a" },
+    { name:"2点ミ", key:"ミ", img:"t_e2.png", sound:"t_e2.m4a" },
+    { name:"2点ファ", key:"ファ", img:"t_f2.png", sound:"t_f2.m4a" },
+    { name:"2点ソ", key:"ソ", img:"t_g2.png", sound:"t_g2.m4a" },
+    { name:"2点ラ", key:"ラ", img:"t_a2.png", sound:"t_a2.m4a" },
+    { name:"2点シ", key:"シ", img:"t_b2.png", sound:"t_b2.m4a" },
+    { name:"3点ド", key:"ド", img:"t_c3.png", sound:"t_c3.m4a" }
+  ],
+
+  3: [
+    { name:"3点ド", key:"ド", img:"t_c3.png", sound:"t_c3.m4a" },
+    { name:"3点レ", key:"レ", img:"t_d3.png", sound:"t_d3.m4a" },
+    { name:"3点ミ", key:"ミ", img:"t_e3.png", sound:"t_e3.m4a" }
+  ],
+
+  4: [
+    { name:"ミ", key:"ミ", img:"t_e.png", sound:"t_e.m4a" },
+    { name:"ファ", key:"ファ", img:"t_f.png", sound:"t_f.m4a" },
+    { name:"ソ", key:"ソ", img:"t_g.png", sound:"t_g.m4a" },
+    { name:"ラ", key:"ラ", img:"t_a.png", sound:"t_a.m4a" },
+    { name:"シ", key:"シ", img:"t_b.png", sound:"t_b.m4a" },
+    { name:"1点ド", key:"ド", img:"t_c1.png", sound:"t_c1.m4a" },
+    { name:"1点レ", key:"レ", img:"t_d1.png", sound:"t_d1.m4a" },
+    { name:"1点ミ", key:"ミ", img:"t_e1.png", sound:"t_e1.m4a" },
+    { name:"1点ファ", key:"ファ", img:"t_f1.png", sound:"t_f1.m4a" }
+  ]
+
+};
+
+
+const bassCards = {
+
+  1: [
+    { name:"1点ド", key:"ド", img:"h_c1.png", sound:"h_c1.m4a" },
+    { name:"シ", key:"シ", img:"h_b0.png", sound:"h_b0.m4a" },
+    { name:"ラ", key:"ラ", img:"h_a0.png", sound:"h_a0.m4a" },
+    { name:"ソ", key:"ソ", img:"h_g.png", sound:"h_g.m4a" },
+    { name:"ファ", key:"ファ", img:"h_f.png", sound:"h_f.m4a" },
+    { name:"ミ", key:"ミ", img:"h_e.png", sound:"h_e.m4a" },
+    { name:"レ", key:"レ", img:"h_d.png", sound:"h_d.m4a" },
+    { name:"ド", key:"ド", img:"h_c00.png", sound:"h_c00.m4a" }
+  ],
+
+  2: [
+    { name:"ド", key:"ド", img:"h_c00.png", sound:"h_c00.m4a" },
+    { name:"し", key:"シ", img:"h_bsi.png", sound:"h_bsi.m4a" },
+    { name:"ら", key:"ラ", img:"h_ara.png", sound:"h_ara.m4a" },
+    { name:"そ", key:"ソ", img:"h_gso.png", sound:"h_gso.m4a" },
+    { name:"ふぁ", key:"ファ", img:"h_ffa.png", sound:"h_ffa.m4a" },
+    { name:"み", key:"ミ", img:"h_emi.png", sound:"h_emi.m4a" },
+    { name:"れ", key:"レ", img:"h_dre.png", sound:"h_dre.m4a" },
+    { name:"ど", key:"ド", img:"h_cdo.png", sound:"h_cdo.m4a" }
+  ],
+
+  3: [
+    { name:"ど", key:"ド", img:"h_cdo.png", sound:"h_cdo.m4a" },
+    { name:"大文字シ", key:"シ", img:"h_bSi1.png", sound:"h_bSi1.m4a" },
+    { name:"大文字ラ", key:"ラ", img:"h_aRa1.png", sound:"h_aRa1.m4a" }
+  ],
+
+  4: [
+    { name:"1点ファ", key:"ファ", img:"h_f1.png", sound:"h_f1.m4a" },
+    { name:"1点ミ", key:"ミ", img:"h_e1.png", sound:"h_e1.m4a" },
+    { name:"1点レ", key:"レ", img:"h_d1.png", sound:"h_d1.m4a" },
+    { name:"1点ド", key:"ド", img:"h_c1.png", sound:"h_c1.m4a" },
+    { name:"シ", key:"シ", img:"h_b0.png", sound:"h_b0.m4a" },
+    { name:"ラ", key:"ラ", img:"h_a0.png", sound:"h_a0.m4a" },
+    { name:"ソ", key:"ソ", img:"h_g.png", sound:"h_g.m4a" },
+    { name:"ファ", key:"ファ", img:"h_f.png", sound:"h_f.m4a" },
+    { name:"ミ", key:"ミ", img:"h_e.png", sound:"h_e.m4a" }
+  ]
+
+};
+
+
+/* =========================================================
+   レベル説明
+========================================================= */
+
+const levelDescriptions = {
+
+  treble: {
+    1: "1点ド → 1点レ → 1点ミ → 1点ファ → 1点ソ → 1点ラ → 1点シ → 2点ド",
+    2: "2点ド → 2点レ → 2点ミ → 2点ファ → 2点ソ → 2点ラ → 2点シ → 3点ド",
+    3: "3点ド → 3点レ → 3点ミ",
+    4: "ミ → ファ → ソ → ラ → シ → 1点ド → 1点レ → 1点ミ → 1点ファ"
+  },
+
+  bass: {
+    1: "1点ド → シ → ラ → ソ → ファ → ミ → レ → ド",
+    2: "ド → し → ら → そ → ふぁ → み → れ → ど",
+    3: "ど → 大文字シ → 大文字ラ",
+    4: "1点ファ → 1点ミ → 1点レ → 1点ド → シ → ラ → ソ → ファ → ミ"
+  }
+
+};
+
+
+/* =========================================================
+   全カード用レベルデータ
+========================================================= */
+
+const allCards = {
+
+  1: [
+    ...trebleCards[1],
+    ...trebleCards[2],
+    ...trebleCards[3]
+  ],
+
+  2: [
+    ...trebleCards[4],
+    ...bassCards[4]
+  ],
+
+  3: [
+    { name:"大文字ラ", key:"ラ", img:"h_aRa1.png", sound:"h_aRa1.m4a" },
+    { name:"大文字シ", key:"シ", img:"h_bSi1.png", sound:"h_bSi1.m4a" },
+    { name:"ど", key:"ド", img:"h_cdo.png", sound:"h_cdo.m4a" },
+    { name:"れ", key:"レ", img:"h_dre.png", sound:"h_dre.m4a" },
+    { name:"み", key:"ミ", img:"h_emi.png", sound:"h_emi.m4a" },
+    { name:"ふぁ", key:"ファ", img:"h_ffa.png", sound:"h_ffa.m4a" },
+    { name:"そ", key:"ソ", img:"h_gso.png", sound:"h_gso.m4a" },
+    { name:"ら", key:"ラ", img:"h_ara.png", sound:"h_ara.m4a" },
+    { name:"し", key:"シ", img:"h_bsi.png", sound:"h_bsi.m4a" },
+    { name:"ド", key:"ド", img:"h_c00.png", sound:"h_c00.m4a" },
+    { name:"レ", key:"レ", img:"h_d.png", sound:"h_d.m4a" },
+    { name:"ミ", key:"ミ", img:"h_e.png", sound:"h_e.m4a" },
+    { name:"ファ", key:"ファ", img:"h_f.png", sound:"h_f.m4a" },
+    { name:"ソ", key:"ソ", img:"h_g.png", sound:"h_g.m4a" },
+    { name:"ラ", key:"ラ", img:"h_a0.png", sound:"h_a0.m4a" },
+    { name:"シ", key:"シ", img:"h_b0.png", sound:"h_b0.m4a" },
+    { name:"1点ド", key:"ド", img:"h_c1.png", sound:"h_c1.m4a" }
+  ],
+
+  4: [
+    ...trebleCards[1],
+    ...trebleCards[2],
+    ...trebleCards[3],
+    ...trebleCards[4],
+    ...bassCards[1],
+    ...bassCards[2],
+    ...bassCards[3],
+    ...bassCards[4]
+  ]
+
+};
+
+
+/* =========================================================
+   状態
+========================================================= */
+
+let selectedClef = null;
+let selectedLevel = null;
+let currentCards = [];
+let currentIndex = 0;
+
+let touchStartX = 0;
+
+let trainingMode = false;
+let trainingLocked = false;
+let lastTrainingIndex = -1;
+
+
+/* =========================================================
+   画面切り替え
+========================================================= */
+
+function hideAllScreens() {
+
+  document
+    .querySelectorAll(".screen, .card-screen")
+    .forEach(screen => {
+      screen.classList.add("hidden");
+    });
+}
+
+
+function showSelectScreen() {
+
+  hideAllScreens();
+
+  document
+    .getElementById("selectScreen")
+    .classList.remove("hidden");
+
+  selectedClef = null;
+  selectedLevel = null;
+  trainingMode = false;
+  trainingLocked = false;
+}
+
+
+function selectClef(clef) {
+
+  selectedClef = clef;
+
+  hideAllScreens();
+
+  const levelScreen =
+    document.getElementById("levelScreen");
+
+  levelScreen.classList.remove("hidden");
+
+  const title =
+    document.getElementById("levelTitle");
+
+  if (clef === "treble") {
+    title.textContent = "ト音記号";
+  } else if (clef === "bass") {
+    title.textContent = "ヘ音記号";
+  } else {
+    title.textContent = "全カード";
+  }
+
+  createLevelButtons();
+}
+
+
+function createLevelButtons() {
+
+  const list =
+    document.getElementById("levelList");
+
+  list.innerHTML = "";
+
+  for (let level = 1; level <= 4; level++) {
+
+    const button =
+      document.createElement("button");
+
+    button.className = "level-button";
+
+    const number =
+      document.createElement("span");
+
+    number.className = "level-number";
+    number.textContent = `レベル ${level}`;
+
+    const description =
+      document.createElement("span");
+
+    description.className =
+      "level-description";
+
+    if (selectedClef === "treble") {
+
+      description.textContent =
+        levelDescriptions.treble[level];
+
+    } else if (selectedClef === "bass") {
+
+      description.textContent =
+        levelDescriptions.bass[level];
+
+    } else {
+
+      const allDescriptions = {
+
+        1: "ト音記号：1点ド・1点レ・1点ミ・1点ファ・1点ソ・1点ラ・1点シ・2点ド・2点レ・2点ミ・2点ファ・2点ソ・2点ラ・2点シ・3点ド・3点レ・3点ミ",
+
+        2: "ト音記号：ミ・ファ・ソ・ラ・シ・1点ド・1点レ・1点ミ・1点ファ ／ ヘ音記号：ミ・ファ・ソ・ラ・シ・1点ド・1点レ・1点ミ・1点ファ",
+
+        3: "ヘ音記号：大文字ラ・大文字シ・ど・れ・み・ふぁ・そ・ら・し・ド・レ・ミ・ファ・ソ・ラ・シ・1点ド",
+
+        4: "ト音記号・ヘ音記号 全て"
+
+      };
+
+      description.textContent =
+        allDescriptions[level];
+
+    }
+
+    button.appendChild(number);
+    button.appendChild(description);
+
+    button.onclick = () => {
+      startLevel(level);
+    };
+
+    list.appendChild(button);
+  }
+}
+
+
+function showLevelScreen() {
+
+  hideAllScreens();
+
+  document
+    .getElementById("levelScreen")
+    .classList.remove("hidden");
+
+  trainingMode = false;
+  trainingLocked = false;
+
+  createLevelButtons();
+}
+
+
+/* =========================================================
+   レベル開始
+========================================================= */
+
+function startLevel(level) {
+
+  selectedLevel = level;
+  currentIndex = 0;
+
+  trainingMode = false;
+  trainingLocked = false;
+  lastTrainingIndex = -1;
+
+  if (selectedClef === "treble") {
+
+    currentCards =
+      trebleCards[level];
+
+  } else if (selectedClef === "bass") {
+
+    currentCards =
+      bassCards[level];
+
+  } else {
+
+    currentCards =
+      allCards[level];
+
+  }
+
+  hideAllScreens();
+
+  const cardScreen =
+    document.getElementById("cardScreen");
+
+  cardScreen.classList.remove("hidden");
+  cardScreen.classList.remove("training-mode");
+
+  document
+    .getElementById("levelBadge")
+    .textContent =
+      `Lv.${level}`;
+
+  showCurrentCard();
+}
+
+
+/* =========================================================
+   カード表示
+========================================================= */
+
+function showCurrentCard() {
+
+  if (!currentCards.length) {
+    return;
+  }
+
+  const card =
+    currentCards[currentIndex];
+
+  const image =
+    document.getElementById("noteCardImg");
+
+  image.src = card.img;
+  image.alt = card.name;
+
+  document
+    .getElementById("trainingCover")
+    .classList.toggle(
+      "hidden",
+      !trainingMode
+    );
+
+  document
+    .getElementById("correctCircle")
+    .classList.remove("show");
+}
+
+
+/* =========================================================
+   左右移動
+========================================================= */
+
+function nextCard() {
+
+  if (!currentCards.length || trainingMode) {
+    return;
+  }
+
+  currentIndex =
+    (currentIndex + 1) %
+    currentCards.length;
+
+  showCurrentCard();
+}
+
+
+function previousCard() {
+
+  if (!currentCards.length || trainingMode) {
+    return;
+  }
+
+  currentIndex =
+    (currentIndex - 1 +
+      currentCards.length) %
+    currentCards.length;
+
+  showCurrentCard();
+}
+
+
+/* =========================================================
+   トレーニング開始
+========================================================= */
+
+function startTraining() {
+
+  if (!currentCards.length) {
+    return;
+  }
+
+  trainingMode = true;
+  trainingLocked = false;
+  lastTrainingIndex = -1;
+
+  const cardScreen =
+    document.getElementById("cardScreen");
+
+  cardScreen.classList.add("training-mode");
+
+  showRandomTrainingQuestion();
+}
+
+
+/* =========================================================
+   ランダム出題
+========================================================= */
+
+function showRandomTrainingQuestion() {
+
+  if (!trainingMode || !currentCards.length) {
+    return;
+  }
+
+  let newIndex;
+
+  if (currentCards.length === 1) {
+
+    newIndex = 0;
+
+  } else {
+
+    do {
+
+      newIndex =
+        Math.floor(
+          Math.random() *
+          currentCards.length
+        );
+
+    } while (newIndex === lastTrainingIndex);
+
+  }
+
+  lastTrainingIndex = newIndex;
+  currentIndex = newIndex;
+
+  trainingLocked = false;
+
+  const card =
+    currentCards[currentIndex];
+
+  const image =
+    document.getElementById("noteCardImg");
+
+  image.src = card.img;
+  image.alt = "";
+
+  document
+    .getElementById("trainingCover")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("correctCircle")
+    .classList.remove("show");
+}
+
+
+/* =========================================================
+   鍵盤
+========================================================= */
+
+function pressKey(key, button) {
+
+  if (!currentCards.length) {
+    return;
+  }
+
+  const card =
+    currentCards[currentIndex];
+
+  /* -------------------------
+     トレーニング
+  ------------------------- */
+
+  if (trainingMode) {
+
+    if (trainingLocked) {
+      return;
+    }
+
+    /* 間違いは完全に無反応 */
+
+    if (key !== card.key) {
+      return;
+    }
+
+    /* 正解 */
+
+    trainingLocked = true;
+
+    /* カード音 → 正解音の順番で再生 */
+    playTrainingCorrectSound(card.sound);
+
+    showCorrectAnimation();
+
+    setTimeout(() => {
+
+      if (trainingMode) {
+        showRandomTrainingQuestion();
+      }
+
+    }, 1000);
+
+    return;
+  }
+
+
+  /* -------------------------
+     通常モード
+  ------------------------- */
+
+  if (key !== card.key) {
+    return;
+  }
+
+  playSound(card.sound);
+  showCat(button);
+}
+
+
+/* =========================================================
+   通常モードの音
+========================================================= */
+
+function playSound(filename) {
+
+  const audio =
+    new Audio(filename);
+
+  audio.currentTime = 0;
+
+  audio.play().catch(() => {});
+}
+
+
+/* =========================================================
+   トレーニング正解音
+   1つのaudio要素で
+   カード音 → 正解音
+========================================================= */
+
+const sharedAudio =
+  document.getElementById("sharedAudio");
+
+
+function playTrainingCorrectSound(cardSound) {
+
+  let correctPlayed = false;
+
+
+  function playCorrect() {
+
+    if (correctPlayed) {
+      return;
+    }
+
+    correctPlayed = true;
+
+    sharedAudio.pause();
+
+    sharedAudio.src =
+      "クイズ正解1 3.mp3";
+
+    sharedAudio.currentTime = 0;
+
+    sharedAudio.play().catch(error => {
+      console.log("正解音再生エラー", error);
+    });
+
+  }
+
+
+  sharedAudio.pause();
+
+  sharedAudio.src = cardSound;
+
+  sharedAudio.currentTime = 0;
+
+
+  sharedAudio.onended = () => {
+
+    sharedAudio.onended = null;
+
+    playCorrect();
+
+  };
+
+
+  sharedAudio.onerror = () => {
+
+    sharedAudio.onerror = null;
+
+    playCorrect();
+
+  };
+
+
+  sharedAudio.play().catch(error => {
+
+    console.log("カード音再生エラー", error);
+
+    playCorrect();
+
+  });
+
+}
+
+
+/* =========================================================
+   正解アニメーション
+========================================================= */
+
+function showCorrectAnimation() {
+
+  const circle =
+    document.getElementById("correctCircle");
+
+  circle.classList.remove("show");
+
+  void circle.offsetWidth;
+
+  circle.classList.add("show");
+}
+
+
+/* =========================================================
+   猫
+========================================================= */
+
+function showCat(button) {
+
+  const oldCat =
+    button.querySelector(".cat");
+
+  if (oldCat) {
+    oldCat.remove();
+  }
+
+  const cat =
+    document.createElement("img");
+
+  cat.className = "cat";
+  cat.src = "cat.PNG";
+  cat.alt = "";
+
+  button.appendChild(cat);
+
+  setTimeout(() => {
+
+    if (cat.parentNode === button) {
+      cat.remove();
+    }
+
+  }, 900);
+}
+
+
+/* =========================================================
+   スワイプ
+========================================================= */
+
+function touchStart(event) {
+
+  if (!event.changedTouches.length) {
+    return;
+  }
+
+  touchStartX =
+    event.changedTouches[0].clientX;
+}
+
+
+function touchEnd(event) {
+
+  if (!event.changedTouches.length) {
+    return;
+  }
+
+  /* トレーニング中はスワイプしない */
+
+  if (trainingMode) {
+    return;
+  }
+
+  const endX =
+    event.changedTouches[0].clientX;
+
+  const diff =
+    endX - touchStartX;
+
+  if (Math.abs(diff) < 50) {
+    return;
+  }
+
+  if (diff < 0) {
+    nextCard();
+  } else {
+    previousCard();
+  }
+}
+
+
+/* =========================================================
+   初期表示
+========================================================= */
+
+showSelectScreen();
+
+</script>
+
+</body>
+</html>
